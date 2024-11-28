@@ -56,7 +56,7 @@ async function replyToTweet() {
   try {
     if (mentions) {
       const response = await axios.post(
-        "http://127.0.0.1:3000/api/agent/test/x-claude-webhook",
+        "https://39b2-146-190-241-210.ngrok-free.app/api/agent/test/x-claude-webhook",
         { tweets: mentions?.tweets, cookies: cookies },
         { timeout: 100000 }
       );
