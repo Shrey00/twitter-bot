@@ -86,7 +86,7 @@ function checkMentions() {
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield login();
-        setInterval(() => checkMentions(), 20000);
+        // setInterval(() => checkMentions(), 20000);
         checkMentions();
     });
 }

@@ -76,7 +76,7 @@ async function checkMentions() {
 
 async function main() {
   await login();
-  setInterval(() => checkMentions(), 20000);
+  // setInterval(() => checkMentions(), 20000);
   checkMentions();
 }
 
