@@ -66,7 +66,7 @@ async function replyToTweet(mentions: QueryTweetsResponse) {
 }
 
 async function checkMentions() {
-  const mentions = await getMentions(("@" + "shreyanshsahu00") as string);
+  const mentions = await getMentions("@" + process.env.TWITTER_USERNAME as string);
   if (mentions === null) return;
   replyToTweet(mentions);
   // generateReplyToTweets(mentions)
