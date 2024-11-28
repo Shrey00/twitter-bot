@@ -16,8 +16,14 @@ const express_1 = __importDefault(require("express"));
 require("dotenv/config");
 const agent_twitter_client_1 = require("agent-twitter-client");
 const agent_twitter_client_2 = require("agent-twitter-client");
+const axios_1 = __importDefault(require("axios"));
 const app = (0, express_1.default)();
 const port = 3500;
+let mentions = null;
+// type TweetWebhookRequest = {
+//   tweets: Tweet[];
+//   cookies: any;
+// };
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
     res.send("Hello, World!");
@@ -30,7 +36,7 @@ function login() {
         console.log(isLoggedIn);
         if (!isLoggedIn) {
             try {
-                yield scraper.login("shreyanshsahu00", "Shrey@27022002");
+                yield scraper.login(process.env.TWITTER_USERNAME, process.env.TWITTER_PASSWORD, process.env.TWITTER_EMAIL);
             }
             catch (e) {
                 console.log("LOGIN ERROR");
@@ -47,7 +53,7 @@ function login() {
 function getMentions(username) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const mentions = yield scraper.fetchSearchTweets(username, 10, agent_twitter_client_1.SearchMode.Latest);
+            mentions = yield scraper.fetchSearchTweets(username, 5, agent_twitter_client_1.SearchMode.Latest);
             return mentions;
         }
         catch (e) {
@@ -56,11 +62,12 @@ function getMentions(username) {
         return null;
     });
 }
-function replyToTweet(mentions) {
+function replyToTweet() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            for (const tweet of mentions.tweets) {
-                yield scraper.sendTweet("Hello there, this is an auto-generated reply, testing the API.", tweet.id);
+            if (mentions) {
+                const response = yield axios_1.default.post("http://localhost:3000/api/agent/test/x-claude-webhook", { tweets: mentions === null || mentions === void 0 ? void 0 : mentions.tweets, cookies: cookies }, { timeout: 100000 });
+                console.log(response.data);
             }
         }
         catch (e) {
@@ -70,20 +77,16 @@ function replyToTweet(mentions) {
 }
 function checkMentions() {
     return __awaiter(this, void 0, void 0, function* () {
-        const mentions = yield getMentions("@" + "shreyanshsahu00");
+        const mentions = yield getMentions("@" + process.env.TWITTER_USERNAME);
         if (mentions === null)
             return;
-        console.log(mentions);
-        replyToTweet(mentions);
-        // generateReplyToTweets(mentions)
+        replyToTweet();
     });
 }
-// async function generateReplyToTweets (mentions: QueryTweetsResponse) {
-// }
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield login();
-        setInterval(() => checkMentions(), 60000);
+        setInterval(() => checkMentions(), 20000);
         checkMentions();
     });
 }

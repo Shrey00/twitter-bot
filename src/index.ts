@@ -1,15 +1,15 @@
 import express from "express";
 import "dotenv/config";
-import cron from "node-cron";
 import { QueryTweetsResponse, SearchMode, Tweet } from "agent-twitter-client";
 import { Scraper } from "agent-twitter-client";
+import axios from "axios";
 const app = express();
 const port = 3500;
-
-type TweetWebhookRequest =  {
-  tweets: Tweet[],
-  cookies: any
-}
+let mentions: QueryTweetsResponse | null = null;
+// type TweetWebhookRequest = {
+//   tweets: Tweet[];
+//   cookies: any;
+// };
 
 app.use(express.json());
 
@@ -22,29 +22,29 @@ let cookies: any;
 
 async function login() {
   const isLoggedIn = await scraper.isLoggedIn();
-  console.log(isLoggedIn)
+  console.log(isLoggedIn);
   if (!isLoggedIn) {
     try {
-      await scraper.login("shreyanshsahu00", "Shrey@27022002");
+      await scraper.login(
+        process.env.TWITTER_USERNAME as string,
+        process.env.TWITTER_PASSWORD as string,
+        process.env.TWITTER_EMAIL as string
+      );
     } catch (e) {
-      console.log("LOGIN ERROR")
+      console.log("LOGIN ERROR");
       console.log(e);
     }
   }
   // Get current session cookies
   cookies = await scraper.getCookies();
   // Set current session cookies
-  console.log(cookies)
+  console.log(cookies);
   await scraper.setCookies(cookies);
 }
 
 async function getMentions(username: string) {
   try {
-    const mentions = await scraper.fetchSearchTweets(
-      username,
-      10,
-      SearchMode.Latest
-    );
+    mentions = await scraper.fetchSearchTweets(username, 5, SearchMode.Latest);
     return mentions;
   } catch (e) {
     console.log(e);
@@ -52,13 +52,15 @@ async function getMentions(username: string) {
   return null;
 }
 
-async function replyToTweet(mentions: QueryTweetsResponse) {
+async function replyToTweet() {
   try {
-    for (const tweet of mentions.tweets) {
-      await scraper.sendTweet(
-        "Hello there, this is an auto-generated reply, testing the API.",
-        tweet.id
+    if (mentions) {
+      const response = await axios.post(
+        "http://localhost:3000/api/agent/test/x-claude-webhook",
+        { tweets: mentions?.tweets, cookies: cookies },
+        { timeout: 100000 }
       );
+      console.log(response.data)
     }
   } catch (e) {
     console.log(e);
@@ -66,20 +68,15 @@ async function replyToTweet(mentions: QueryTweetsResponse) {
 }
 
 async function checkMentions() {
-  const mentions = await getMentions("@" + "shreyanshsahu00");
+  const mentions = await getMentions("@" + process.env.TWITTER_USERNAME);
   if (mentions === null) return;
-  console.log(mentions);
-  replyToTweet(mentions);
-  // generateReplyToTweets(mentions)
+  replyToTweet();
 }
 
-// async function generateReplyToTweets (mentions: QueryTweetsResponse) {
-
-// }
 
 async function main() {
   await login();
-  setInterval(() => checkMentions(), 60000);
+  setInterval(() => checkMentions(), 20000);
   checkMentions();
 }
 
