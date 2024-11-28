@@ -25,7 +25,7 @@ async function login() {
   console.log(isLoggedIn)
   if (!isLoggedIn) {
     try {
-      await scraper.login(process.env.TWITTER_USERNAME as string, process.env.TWITTER_PASSWORD as string);
+      await scraper.login("shreyanshsahu00", "Shrey@27022002");
     } catch (e) {
       console.log("LOGIN ERROR")
       console.log(e);
@@ -66,7 +66,7 @@ async function replyToTweet(mentions: QueryTweetsResponse) {
 }
 
 async function checkMentions() {
-  const mentions = await getMentions("@" + process.env.TWITTER_USERNAME as string);
+  const mentions = await getMentions("@" + "shreyanshsahu00");
   if (mentions === null) return;
   console.log(mentions);
   replyToTweet(mentions);

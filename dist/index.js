@@ -30,7 +30,7 @@ function login() {
         console.log(isLoggedIn);
         if (!isLoggedIn) {
             try {
-                yield scraper.login(process.env.TWITTER_USERNAME, process.env.TWITTER_PASSWORD);
+                yield scraper.login("shreyanshsahu00", "Shrey@27022002");
             }
             catch (e) {
                 console.log("LOGIN ERROR");
@@ -70,7 +70,7 @@ function replyToTweet(mentions) {
 }
 function checkMentions() {
     return __awaiter(this, void 0, void 0, function* () {
-        const mentions = yield getMentions("@" + process.env.TWITTER_USERNAME);
+        const mentions = yield getMentions("@" + "shreyanshsahu00");
         if (mentions === null)
             return;
         console.log(mentions);
