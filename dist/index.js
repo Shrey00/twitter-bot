@@ -66,7 +66,7 @@ function replyToTweet() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (mentions) {
-                const response = yield axios_1.default.post("https://39b2-146-190-241-210.ngrok-free.app/api/agent/test/x-claude-webhook", { tweets: mentions === null || mentions === void 0 ? void 0 : mentions.tweets, cookies: cookies }, { timeout: 100000 });
+                const response = yield axios_1.default.post("https://39b2-146-190-241-210.ngrok-free.app/api/agent/yggdraisil/x-claude-webhook", { tweets: mentions === null || mentions === void 0 ? void 0 : mentions.tweets, cookies: cookies }, { timeout: 600000 });
                 console.log(response.data);
             }
         }

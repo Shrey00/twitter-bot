@@ -56,9 +56,9 @@ async function replyToTweet() {
   try {
     if (mentions) {
       const response = await axios.post(
-        "https://39b2-146-190-241-210.ngrok-free.app/api/agent/test/x-claude-webhook",
+        "https://39b2-146-190-241-210.ngrok-free.app/api/agent/yggdraisil/x-claude-webhook",
         { tweets: mentions?.tweets, cookies: cookies },
-        { timeout: 100000 }
+        { timeout: 600000 }
       );
       console.log(response.data)
     }
