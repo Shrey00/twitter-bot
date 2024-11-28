@@ -73,6 +73,7 @@ function checkMentions() {
         const mentions = yield getMentions("@" + process.env.TWITTER_USERNAME);
         if (mentions === null)
             return;
+        console.log(mentions);
         replyToTweet(mentions);
         // generateReplyToTweets(mentions)
     });
@@ -82,7 +83,8 @@ function checkMentions() {
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield login();
-        setInterval(() => checkMentions(), 10000);
+        setInterval(() => checkMentions(), 60000);
+        checkMentions();
     });
 }
 main();

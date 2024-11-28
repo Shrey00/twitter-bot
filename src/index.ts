@@ -68,6 +68,7 @@ async function replyToTweet(mentions: QueryTweetsResponse) {
 async function checkMentions() {
   const mentions = await getMentions("@" + process.env.TWITTER_USERNAME as string);
   if (mentions === null) return;
+  console.log(mentions);
   replyToTweet(mentions);
   // generateReplyToTweets(mentions)
 }
@@ -78,7 +79,8 @@ async function checkMentions() {
 
 async function main() {
   await login();
-  setInterval(() => checkMentions(), 10000);
+  setInterval(() => checkMentions(), 60000);
+  checkMentions();
 }
 
 main();
