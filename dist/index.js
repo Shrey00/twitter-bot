@@ -20,10 +20,6 @@ const axios_1 = __importDefault(require("axios"));
 const app = (0, express_1.default)();
 const port = 3500;
 let mentions = null;
-// type TweetWebhookRequest = {
-//   tweets: Tweet[];
-//   cookies: any;
-// };
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
     res.send("Hello, World!");
@@ -33,10 +29,9 @@ let cookies;
 function login() {
     return __awaiter(this, void 0, void 0, function* () {
         const isLoggedIn = yield scraper.isLoggedIn();
-        console.log(isLoggedIn);
         if (!isLoggedIn) {
             try {
-                yield scraper.login(process.env.TWITTER_USERNAME, process.env.TWITTER_PASSWORD, process.env.TWITTER_EMAIL);
+                yield scraper.login("shreyanshsahu00", "Shrey@27022002", "shreysahugar@gmail.com");
             }
             catch (e) {
                 console.log("LOGIN ERROR");
@@ -45,8 +40,6 @@ function login() {
         }
         // Get current session cookies
         cookies = yield scraper.getCookies();
-        // Set current session cookies
-        console.log(cookies);
         yield scraper.setCookies(cookies);
     });
 }
@@ -66,8 +59,8 @@ function replyToTweet() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (mentions) {
-                const response = yield axios_1.default.post("https://39b2-146-190-241-210.ngrok-free.app/api/agent/yggdraisil/x-claude-webhook", { tweets: mentions === null || mentions === void 0 ? void 0 : mentions.tweets, cookies: cookies }, { timeout: 600000 });
-                console.log(response.data);
+                const payload = { tweets: mentions === null || mentions === void 0 ? void 0 : mentions.tweets, cookies: cookies };
+                const response = yield axios_1.default.post("agents.makerdock.xyz/api/agent/etienne/x-claude-webhook", payload, { timeout: 100000 });
             }
         }
         catch (e) {
@@ -86,8 +79,8 @@ function checkMentions() {
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield login();
-        // setInterval(() => checkMentions(), 20000);
-        checkMentions();
+        setInterval(() => checkMentions(), 30000);
+        // checkMentions();
     });
 }
 main();

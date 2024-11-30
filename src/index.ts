@@ -2,14 +2,15 @@ import express from "express";
 import "dotenv/config";
 import { QueryTweetsResponse, SearchMode, Tweet } from "agent-twitter-client";
 import { Scraper } from "agent-twitter-client";
+import { Cookie } from "tough-cookie";
 import axios from "axios";
 const app = express();
 const port = 3500;
 let mentions: QueryTweetsResponse | null = null;
-// type TweetWebhookRequest = {
-//   tweets: Tweet[];
-//   cookies: any;
-// };
+type TweetWebhookRequest = {
+  tweets: Tweet[];
+  cookies: (string | Cookie)[];
+};
 
 app.use(express.json());
 
@@ -22,14 +23,19 @@ let cookies: any;
 
 async function login() {
   const isLoggedIn = await scraper.isLoggedIn();
-  console.log(isLoggedIn);
   if (!isLoggedIn) {
     try {
-      await scraper.login(
-        process.env.TWITTER_USERNAME as string,
-        process.env.TWITTER_PASSWORD as string,
-        process.env.TWITTER_EMAIL as string
-      );
+      if(!process.env.TWITTER_USERNAME?.length)
+        await scraper.login(
+          process.env.TWITTER_USERNAME as string,
+          process.env.TWITTER_PASSWORD as string
+        );
+      else
+        await scraper.login(
+          process.env.TWITTER_USERNAME as string,
+          process.env.TWITTER_PASSWORD as string,
+          process.env.TWITTER_EMAIL as string
+        );
     } catch (e) {
       console.log("LOGIN ERROR");
       console.log(e);
@@ -37,8 +43,6 @@ async function login() {
   }
   // Get current session cookies
   cookies = await scraper.getCookies();
-  // Set current session cookies
-  console.log(cookies);
   await scraper.setCookies(cookies);
 }
 
@@ -55,12 +59,12 @@ async function getMentions(username: string) {
 async function replyToTweet() {
   try {
     if (mentions) {
+      const payload : TweetWebhookRequest = { tweets: mentions?.tweets, cookies: cookies }
       const response = await axios.post(
-        " https://f997-2409-40c4-11c0-8960-856b-703d-29c4-ae82.ngrok-free.app/api/agent/yggdraisil/x-claude-webhook",
-        { tweets: mentions?.tweets, cookies: cookies },
-        { timeout: 600000 }
+        "agents.makerdock.xyz/api/agent/etienne/x-claude-webhook",
+        payload,
+        { timeout: 100000 }
       );
-      console.log(response.data)
     }
   } catch (e) {
     console.log(e);
@@ -76,8 +80,8 @@ async function checkMentions() {
 
 async function main() {
   await login();
-  // setInterval(() => checkMentions(), 20000);
-  checkMentions();
+  setInterval(() => checkMentions(), 30000);
+  // checkMentions();
 }
 
 main();
