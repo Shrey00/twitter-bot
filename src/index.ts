@@ -57,12 +57,12 @@ class RequestQueue {
 
 async function fetchMentionedTweets() {
   console.log("# fetching mentioned tweets....");
-  const maxTweets = 20;
+  const maxTweets = 10;
   const mentionedTweets: Tweet[] = [];
   try {
     const mentions = await scraper.fetchSearchTweets(
       `@${process.env.TWITTER_USERNAME}`,
-      10,
+      maxTweets,
       SearchMode.Latest
     );
     if (mentions) {
@@ -149,7 +149,7 @@ async function ensureAuthenticated() {
 async function getReply(mentionedTweets: Tweet[]) {
   try {
     const response = await axios.post(
-      `${process.env.WEBHOOK_URL}/api/agent/bogusbob/x-claude-webhook`,
+      `${process.env.REPLY_WEBHOOK_URL}/api/agent/bogusbob/x-claude-webhook`,
       mentionedTweets,
       { timeout: 30000 }
     );
@@ -174,6 +174,10 @@ async function main() {
   const twitterRequestQueue = new RequestQueue();
   twitterRequestQueue.push(interactionFunction);
   twitterRequestQueue.processRequest();
+}
+
+async function newContentGenerationPerDay() {
+  const response = await fetch(`${process.env.POST_CONTENT_WEBHOOK_URL}/api/agent/bogusbob/tweet-cron`)
 }
 
 main();
