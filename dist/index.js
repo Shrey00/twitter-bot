@@ -88,10 +88,10 @@ class RequestQueue {
 function fetchMentionedTweets() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("# fetching mentioned tweets....");
-        const maxTweets = 20;
+        const maxTweets = 10;
         const mentionedTweets = [];
         try {
-            const mentions = yield scraper.fetchSearchTweets(`@${process.env.TWITTER_USERNAME}`, 10, agent_twitter_mod_1.SearchMode.Latest);
+            const mentions = yield scraper.fetchSearchTweets(`@${process.env.TWITTER_USERNAME}`, maxTweets, agent_twitter_mod_1.SearchMode.Latest);
             if (mentions) {
                 for (const tweet of mentions.tweets) {
                     if (tweet.username !== process.env.TWITTER_USERNAME)
@@ -163,7 +163,7 @@ function ensureAuthenticated() {
 function getReply(mentionedTweets) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield axios_1.default.post(`${process.env.WEBHOOK_URL}/api/agent/bogusbob/x-claude-webhook`, mentionedTweets, { timeout: 30000 });
+            const response = yield axios_1.default.post(`${process.env.REPLY_WEBHOOK_URL}/api/agent/bogusbob/x-claude-webhook`, mentionedTweets, { timeout: 30000 });
             return response;
         }
         catch (e) {
@@ -188,6 +188,11 @@ function main() {
         const twitterRequestQueue = new RequestQueue();
         twitterRequestQueue.push(interactionFunction);
         twitterRequestQueue.processRequest();
+    });
+}
+function newContentGenerationPerDay() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`${process.env.POST_CONTENT_WEBHOOK_URL}/api/agent/bogusbob/tweet-cron`);
     });
 }
 main();
